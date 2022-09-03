@@ -39,6 +39,28 @@ public class Grafo {
     reader.close();
   }
 
+  public Grafo(String fileName, int teste) throws IOException {
+    File file = new File(fileName);
+    FileReader reader = new FileReader(file);
+    BufferedReader bufferedReader = new BufferedReader(reader);
+
+    // Read header
+    String[] line = bufferedReader.readLine().split(" ");
+    this.countNodes = (Integer.parseInt(line[0]));
+    int fileLines = (Integer.parseInt(line[1]));
+    // Create and fill adjMatrix with read edges
+    this.adjMatrix = new int[this.countNodes][this.countNodes];
+    for (int i = 0; i < fileLines; ++i) {
+      String[] edgeInfo = bufferedReader.readLine().split(" ");
+      int source = Integer.parseInt(edgeInfo[0]);
+      int sink = Integer.parseInt(edgeInfo[1]);
+      int weight = Integer.parseInt(edgeInfo[2]);
+      addEdgeUnoriented(source, sink, weight);
+    }
+    bufferedReader.close();
+    reader.close();
+  }
+
   public void addEdge(int source, int sink, int weight) {
     if (source < 0 || source >= this.adjMatrix.length || sink < 0 || sink >= this.adjMatrix.length || weight <= 0) {
       System.err.println("Invalid edge!\nsource: " + source + "\nsink: " + sink + "\nweight: " + weight);
@@ -285,12 +307,12 @@ public class Grafo {
         ord_top_aux(i, desc, R);
       }
     }
-    
-    R.add(0,u);
+
+    R.add(0, u);
 
   }
 
-  public void ord_top() {
+  public ArrayList<Integer> ord_top() {
     ArrayList<Integer> desc = new ArrayList<>();
     for (int i = 0; i < this.countNodes; i++) {
       desc.add(0);
@@ -303,8 +325,84 @@ public class Grafo {
         ord_top_aux(i, desc, R);
       }
     }
-    System.out.println(R);
     return R;
+
   }
 
+  private void connected_comp_aux(int u, ArrayList<Integer> desc, int comp) {
+    desc.set(u, comp);
+    for (int i = 0; i < desc.size(); i++) {
+      if (this.adjMatrix[u][i] != 0 && desc.get(i) == 0) {
+        connected_comp_aux(i, desc, comp);
+      }
+    }
+
+  }
+
+  public ArrayList<Integer> connected_comp() {
+    ArrayList<Integer> desc = new ArrayList<>();
+    for (int i = 0; i < this.countNodes; i++) {
+      desc.add(0);
+    }
+
+    int comp = 0;
+    for (int i = 0; i < desc.size(); i++) {
+      if (desc.get(i) == 0) {
+        comp = comp + 1;
+        connected_comp_aux(i, desc, comp);
+      }
+    }
+    return desc;
+  }
+
+  public boolean has_cycle_oriented(int s) {
+
+    ArrayList<Integer> desc = new ArrayList<>();
+    ArrayList<Integer> Q = new ArrayList<>();
+    ArrayList<Integer> R = new ArrayList<>();
+    for (int i = 0; i < this.countNodes; i++) {
+      desc.add(0);
+    }
+    Q.add(s);
+    R.add(s);
+    desc.set(s, 1);
+    int u = 0;
+
+    while (Q.size() > 0) {
+      u = Q.get(0);
+      Q.remove(0);
+
+      for (int i = 0; i < desc.size(); i++) {
+        if (this.adjMatrix[u][i] != 0) {
+          if (desc.get(i) == 0) {
+
+            Q.add(i);
+            R.add(i);
+            desc.set(i, 1);
+          } else {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  public boolean has_cycle_oriented() {
+    boolean ciclo = false;
+    ArrayList<Integer> desc = new ArrayList<>();
+    for (int i = 0; i < this.countNodes; i++) {
+      desc.add(0);
+    }
+    for (int i = 0; this.countNodes > i; i++) {
+      if (desc.get(i) == 0) {
+        desc.set(i, 1);
+        ciclo = has_cycle_oriented(i);
+        if (ciclo == true)
+          return ciclo;
+
+      }
+    }
+    return ciclo;
+  }
 }
