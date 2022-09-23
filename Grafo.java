@@ -406,19 +406,23 @@ public class Grafo {
     return ciclo;
   }
 
-  public int menorDist(int u) {
-    int min = this.adjMatrix[u][0];
-
-    for (int i = 0; i < this.countNodes - 1; i++) {
-      if (this.adjMatrix[u][i] > this.adjMatrix[u][i + 1]) {
-        min = i;
+  public int menorDist(int u, ArrayList <Integer> Q) {
+    int min = Q.get(Q.size()-1);
+    int pmin=999999;
+    for (int i = Q.get(0); i < this.countNodes; i++) {
+      if(Q.contains(i) && this.adjMatrix[u][i]!=0){
+        
+        if (this.adjMatrix[u][i] < pmin) {
+          min = i;
+          pmin=this.adjMatrix[u][i];
+        }
       }
     }
     
     return min;
   }
 
-  public int dikstra(int s) {
+  public void dijkstra(int s) {
     int Inf = 9999999;
     ArrayList<Integer> dist = new ArrayList<>();
     ArrayList<Integer> Q = new ArrayList<>();
@@ -430,23 +434,23 @@ public class Grafo {
     }
     dist.set(s, 0);
     int u = s;
-    while (Q != null) {
-      u = this.menorDist(u);
-      Q.remove(u);
+    Q.remove(0);
+    while (Q.size()>0) {
 
       for(int v=0; v<this.countNodes;v++){
         if(this.adjMatrix[u][v]>0){
           if (dist.get(v)>dist.get(u) + this.adjMatrix[u][v]){
-            dist.set(v)=dist.get(u) + this.adjMatrix[u][v];
-            pred.set(v)=u;
+            dist.set(v,dist.get(u) + this.adjMatrix[u][v]);
+            pred.set(v,u);
           }
         }
       }
+      u = this.menorDist(u,Q);
+      Q.remove(Integer.valueOf(u));
       
     }
 
     System.out.println(dist);
     System.out.println(pred);
-    return 1;
   }
 }
