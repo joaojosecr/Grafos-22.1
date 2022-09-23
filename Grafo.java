@@ -405,4 +405,48 @@ public class Grafo {
     }
     return ciclo;
   }
+
+  public int menorDist(int u) {
+    int min = this.adjMatrix[u][0];
+
+    for (int i = 0; i < this.countNodes - 1; i++) {
+      if (this.adjMatrix[u][i] > this.adjMatrix[u][i + 1]) {
+        min = i;
+      }
+    }
+    
+    return min;
+  }
+
+  public int dikstra(int s) {
+    int Inf = 9999999;
+    ArrayList<Integer> dist = new ArrayList<>();
+    ArrayList<Integer> Q = new ArrayList<>();
+    ArrayList<Integer> pred = new ArrayList<>();
+    for (int i = 0; i < this.countNodes; i++) {
+      dist.add((int) Inf);
+      Q.add(i);
+      pred.add(-1);
+    }
+    dist.set(s, 0);
+    int u = s;
+    while (Q != null) {
+      u = this.menorDist(u);
+      Q.remove(u);
+
+      for(int v=0; v<this.countNodes;v++){
+        if(this.adjMatrix[u][v]>0){
+          if (dist.get(v)>dist.get(u) + this.adjMatrix[u][v]){
+            dist.set(v)=dist.get(u) + this.adjMatrix[u][v];
+            pred.set(v)=u;
+          }
+        }
+      }
+      
+    }
+
+    System.out.println(dist);
+    System.out.println(pred);
+    return 1;
+  }
 }
