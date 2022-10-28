@@ -6,7 +6,7 @@ class Main {
 
     int opcao = 0;
     Scanner scan = new Scanner(System.in);
-    String filename="toy.txt";
+    String filename = "toy.txt";
     
     
     while (opcao != 3) {
